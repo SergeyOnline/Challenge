@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  Challenge
+//
+//  Created by Сергей on 28.01.2022.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+API_URL = prodapp.mosmetro.ru/api/tweets/v1.0/
