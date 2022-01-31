@@ -27,6 +27,7 @@ final class MainTwitterViewController: UIViewController {
 			let favoriteCount: String
 			let retweetCount: String
 			let date: String
+			let imageURL: String?
 		}
 	}
 	
@@ -176,6 +177,17 @@ extension MainTwitterViewController: UITableViewDelegate, UITableViewDataSource 
 			cell.favoriteCountLabel.text = propsData[indexPath.row - 1].favoriteCount
 			cell.retweetCountLabel.text = propsData[indexPath.row - 1].retweetCount
 			cell.dateLabel.text = propsData[indexPath.row - 1].date
+			if let imageURL = propsData[indexPath.row - 1].imageURL {
+				presenter?.getImageFromUrl(url: imageURL, completion: { image in
+					DispatchQueue.main.async {
+						cell.loadedImageView.isHidden = false
+						cell.loadedImageView.image = image
+					}
+				})
+			} else {
+				cell.loadedImageView.isHidden = true
+			}
+			
 			return cell
 		}
 		return UITableViewCell()

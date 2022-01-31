@@ -5,7 +5,7 @@
 //  Created by Сергей on 28.01.2022.
 //
 
-import Foundation
+import UIKit
 
 enum NetworkError: Error {
 	case badURL
@@ -27,6 +27,7 @@ enum NetworkError: Error {
 
 protocol NetworkServiceProtocol {
 	func getTwits(completion: @escaping (Result<Twits?, Error>) -> Void)
+	func getImageFromURL(_ url: URL, completion: @escaping (UIImage?) -> Void)
 }
 
 final class NetworkService: NetworkServiceProtocol {
@@ -60,6 +61,35 @@ final class NetworkService: NetworkServiceProtocol {
 				completion(.failure(error))
 			}
 
+		}
+		task.resume()
+	}
+	
+	func getImageFromURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
+
+		let request = URLRequest(url: url)
+		let session = URLSession.shared
+		let task = session.dataTask(with: request) { data, response, error in
+			if error != nil {
+				completion(nil)
+			}
+
+			if let response = response as? HTTPURLResponse {
+				if response.statusCode != 200 {
+					completion(nil)
+				}
+			}
+
+			guard let data = data else {
+				completion(nil)
+				return
+			}
+
+			if let image = UIImage(data: data) {
+				completion(image)
+			} else {
+				completion(nil)
+			}
 		}
 		task.resume()
 	}

@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 protocol IMainTwitterPresenter: AnyObject {
 	init(view: IMainTwitterViewController, networkService: NetworkServiceProtocol)
 	func changeState()
+	func getImageFromUrl(url: String, completion: @escaping (UIImage?) -> ())
 }
 
 protocol IMainTwitterViewController: AnyObject {
@@ -36,6 +38,13 @@ final class MainTwitterPresenter: IMainTwitterPresenter {
 		getTwits()
 	}
 	
+	func getImageFromUrl(url: String, completion: @escaping (UIImage?) -> ()) {
+		guard let url = URL(string: url) else { return }
+		networkService.getImageFromURL(url) { image in
+			completion(image)
+		}
+	}
+	
 //	MARK: - private functions
 	private func getTwits() {
 		networkService.getTwits { result in
@@ -57,13 +66,37 @@ final class MainTwitterPresenter: IMainTwitterPresenter {
 	
 	private func convertTwitsToProps(twits: Twits) -> [MainTwitterViewController.Props.Data] {
 		var data: [MainTwitterViewController.Props.Data] = []
-		for twit in twits.data.sorted(by: { $0.createdAt > $1.createdAt }) {
+		for (i, twit) in twits.data.sorted(by: { $0.createdAt > $1.createdAt }).enumerated() {
 			let date  = Date(timeIntervalSince1970: twit.createdAt / 1000)
-			let prop = MainTwitterViewController.Props.Data(id:twit.id,
-															text: twit.text,
-															favoriteCount: String(twit.favoriteCount),
-															retweetCount: String(twit.retweetCount),
-															date: stringFromDate(date))
+			var prop: MainTwitterViewController.Props.Data
+			
+//		MARK: - hardcode image url
+			if i == 1 {
+				prop = MainTwitterViewController.Props.Data(id:twit.id,
+																text: twit.text,
+																favoriteCount: String(twit.favoriteCount),
+																retweetCount: String(twit.retweetCount),
+																date: stringFromDate(date),
+																imageURL: "https://guitaristnextdoor.com/wp-content/uploads/2021/04/presenting-6-Best-Guitar-Amps-Under-200-1024x663.png")
+			} else {
+				prop = MainTwitterViewController.Props.Data(id:twit.id,
+																text: twit.text,
+																favoriteCount: String(twit.favoriteCount),
+																retweetCount: String(twit.retweetCount),
+																date: stringFromDate(date),
+																imageURL: twit.imageURL)
+			}
+			
+//		MARK: - image url from JSON
+//			let prop = MainTwitterViewController.Props.Data(id:twit.id,
+//															text: twit.text,
+//															favoriteCount: String(twit.favoriteCount),
+//															retweetCount: String(twit.retweetCount),
+//															date: stringFromDate(date),
+//															imageURL: twit.imageURL)
+			
+			
+			
 			data.append(prop)
 		}
 		return data

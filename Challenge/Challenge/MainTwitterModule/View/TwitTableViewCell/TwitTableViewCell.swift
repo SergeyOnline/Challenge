@@ -13,6 +13,13 @@ final class TwitTableViewCell: UITableViewCell {
 	@IBOutlet weak var retweetCountLabel: UILabel!
 	@IBOutlet weak var favoriteCountLabel: UILabel!
 	@IBOutlet weak var dateLabel: UILabel!
+	@IBOutlet weak var loadedImageView: UIImageView!
+	
+	override func prepareForReuse() {
+		super.prepareForReuse()
+		loadedImageView.image = nil
+		loadedImageView.isHidden = true
+	}
 	
 	override func awakeFromNib() {
         super.awakeFromNib()
